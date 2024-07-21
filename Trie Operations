@@ -1,0 +1,99 @@
+import java.util.*;
+
+class TrieNode {
+    boolean isEndOfWord;
+    Map<Character, TrieNode> children;
+
+    TrieNode() {
+        this.isEndOfWord = false;
+        this.children = new HashMap<>();
+    }
+}
+
+public class Trie {
+    private TrieNode root;
+
+    public Trie() {
+        this.root = new TrieNode();
+    }
+
+    //Inserts a word into the trie.
+
+    public void insert(String word) {
+        TrieNode node = root;
+        for (char ch : word.toCharArray()) {
+            node = node.children.computeIfAbsent(ch, c -> new TrieNode());
+        }
+        node.isEndOfWord = true;  // Mark the end of the word
+    }
+
+    //Returns if the word is in the trie.
+     
+    public boolean search(String word) {
+        TrieNode node = root;
+        for (char ch : word.toCharArray()) {
+            node = node.children.get(ch);
+            if (node == null) {
+                return false;  // Word not found
+            }
+        }
+        return node.isEndOfWord;  // Check if it's the end of a valid word
+    }
+
+    //Returns if there is any word in the trie that starts with the given prefix.
+     
+    public boolean startsWith(String prefix) {
+        TrieNode node = root;
+        for (char ch : prefix.toCharArray()) {
+            node = node.children.get(ch);
+            if (node == null) {
+                return false;  // No word with this prefix
+            }
+        }
+        return true;  // Prefix found
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Trie trie = new Trie();
+	//menu
+        while (true) {
+            System.out.println("\nChoose an option:");
+            System.out.println("1. Insert a word");
+            System.out.println("2. Search for a word");
+            System.out.println("3. Check prefix");
+            System.out.println("4. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();  
+// Calling the functions according to user’s choice
+
+            if (choice == 1) {
+                System.out.print("Enter the word to insert: ");
+                String word = scanner.nextLine();
+                trie.insert(word);
+                System.out.println("Word inserted successfully.");
+            } 
+else if (choice == 2) {
+                System.out.print("Enter the word to search: ");
+                String word = scanner.nextLine();
+                boolean exists = trie.search(word);
+                System.out.println("Word exists: " + exists);
+            }
+ else if (choice == 3) {
+                System.out.print("Enter the prefix to check: ");
+                String prefix = scanner.nextLine();
+                boolean hasPrefix = trie.startsWith(prefix);
+                System.out.println("Prefix exists: " + hasPrefix);
+            }
+ else if (choice == 4) {
+                System.out.println("Exiting...");
+                break;
+            } 
+else {
+                System.out.println("Invalid choice. Please select a valid option.");
+            }
+        }
+        
+    }
+}
