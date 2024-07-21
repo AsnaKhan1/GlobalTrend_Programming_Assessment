@@ -1,0 +1,183 @@
+import java.util.*;
+
+class Interval {
+    int start;
+    int end;
+
+    Interval(int start, int end) {
+        this.start = start;
+        this.end = end;
+    }
+
+   //Override
+    public String toString() {
+        return "[" + start + ", " + end + "]";
+    }
+}
+
+// Class representing a node in the interval tree
+class IntervalNode {
+    Interval interval; // The interval stored in this node
+    int maxEnd;        // The maximum end value in this subtree
+    IntervalNode left; // Left child
+    IntervalNode right;// Right child
+
+    IntervalNode(Interval interval) {
+        this.interval = interval;
+        this.maxEnd = interval.end;
+    }
+}
+
+// Class implementing the interval tree
+class IntervalTree {
+    private IntervalNode root; // Root of the interval tree
+
+    // Insert a new interval into the tree
+    public void insertInterval(int start, int end) {
+        Interval newInterval = new Interval(start, end);
+        root = insert(root, newInterval);
+    }
+
+    // Recursive method to insert an interval and update maxEnd
+    private IntervalNode insert(IntervalNode node, Interval interval) {
+        if (node == null) return new IntervalNode(interval);
+
+        if (interval.start < node.interval.start) {
+            node.left = insert(node.left, interval);
+        } else {
+            node.right = insert(node.right, interval);
+        }
+
+        // Update the maxEnd value for the current node
+        if (node.maxEnd < interval.end) {
+            node.maxEnd = interval.end;
+        }
+
+        return node;
+    }
+
+    // Delete an interval from the tree
+    public void deleteInterval(int start, int end) {
+        Interval intervalToRemove = new Interval(start, end);
+        root = delete(root, intervalToRemove);
+    }
+
+    // Recursive method to delete an interval and maintain the tree structure
+    private IntervalNode delete(IntervalNode node, Interval interval) {
+        if (node == null) return null;
+
+        // Navigate to the correct subtree
+        if (interval.start < node.interval.start) {
+            node.left = delete(node.left, interval);
+        } else if (interval.start > node.interval.start || (interval.start == node.interval.start && interval.end != node.interval.end)) {
+            node.right = delete(node.right, interval);
+        } else {
+            if (node.left == null) return node.right;
+            if (node.right == null) return node.left;
+
+            IntervalNode minLargerNode = getMin(node.right);
+            node.interval = minLargerNode.interval;
+            node.right = delete(node.right, minLargerNode.interval);
+        }
+
+        // Update the maxEnd value for the current node
+        node.maxEnd = Math.max(node.interval.end, Math.max(maxEnd(node.left), maxEnd(node.right)));
+        return node;
+    }
+
+    // Helper method to get the minimum node in the right subtree
+    private IntervalNode getMin(IntervalNode node) {
+        while (node.left != null) node = node.left;
+        return node;
+    }
+
+    // Helper method to get the maximum end value from a subtree
+    private int maxEnd(IntervalNode node) {
+        return node == null ? Integer.MIN_VALUE : node.maxEnd;
+    }
+
+    // Find all intervals that overlap with the given interval
+    public List<Interval> findOverlappingIntervals(int start, int end) {
+        Interval targetInterval = new Interval(start, end);
+        List<Interval> result = new ArrayList<>();
+        findOverlappingIntervals(root, targetInterval, result);
+        return result;
+    }
+
+    // Recursive method to find all overlapping intervals
+    private void findOverlappingIntervals(IntervalNode node, Interval interval, List<Interval> result) {
+        if (node == null) return;
+
+        // Check if the current node's interval overlaps with the given interval
+        if (isOverlapping(node.interval, interval)) {
+            result.add(node.interval);
+        }
+
+        // If left child exists and may overlap, search left subtree
+        if (node.left != null && node.left.maxEnd >= interval.start) {
+            findOverlappingIntervals(node.left, interval, result);
+        }
+
+        // Search right subtree
+        findOverlappingIntervals(node.right, interval, result);
+    }
+
+    // Helper method to check if two intervals overlap
+    private boolean isOverlapping(Interval a, Interval b) 
+    {
+        return a.start <= b.end && b.start <= a.end;
+    }
+
+   
+    public static void main(String[] args)
+    {
+        IntervalTree tree = new IntervalTree();
+        Scanner scanner = new Scanner(System.in);
+
+ //options menu
+        while (true) 
+        {
+            System.out.println("Choose an operation: insert, delete, find, exit");
+            String operation = scanner.nextLine();
+
+            if (operation.equalsIgnoreCase("insert")) 
+            {
+                System.out.print("Enter start of interval: ");
+                int start = scanner.nextInt();
+                System.out.print("Enter end of interval: ");
+                int end = scanner.nextInt();
+                scanner.nextLine(); // consume newline
+                tree.insertInterval(start, end);
+                System.out.println("Inserted interval: [" + start + ", " + end + "]");
+            } 
+            else if (operation.equalsIgnoreCase("delete")) 
+            {
+                System.out.print("Enter start of interval: ");
+                int start = scanner.nextInt();
+                System.out.print("Enter end of interval: ");
+                int end = scanner.nextInt();
+                scanner.nextLine(); // consume newline
+                tree.deleteInterval(start, end);
+                System.out.println("Deleted interval: [" + start + ", " + end + "]");
+            } 
+            else if (operation.equalsIgnoreCase("find")) 
+            {
+                System.out.print("Enter start of interval: ");
+                int start = scanner.nextInt();
+                System.out.print("Enter end of interval: ");
+                int end = scanner.nextInt();
+                scanner.nextLine(); 
+                List<Interval> overlappingIntervals = tree.findOverlappingIntervals(start, end);
+                System.out.println("Overlapping intervals: " + overlappingIntervals);
+            }
+            else if (operation.equalsIgnoreCase("exit")) 
+            {
+                break;
+            }
+            else 
+            {
+                System.out.println("Invalid operation. Please try again.");
+            }
+        }
+    }
+}
