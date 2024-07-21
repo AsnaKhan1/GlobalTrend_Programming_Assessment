@@ -1,0 +1,122 @@
+
+
+import java.util.*;
+
+class LRUCache {
+
+// Inner class representing a node in the doubly linked list
+    class Node {
+        int key;
+        int value;
+        Node prev;
+        Node next;
+
+// Constructor to initialize a new node
+        public Node(int key, int value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    private int capacity; // Maximum capacity of the LRU cache
+    // HashMap to store cache keys and corresponding nodes
+    private HashMap<Integer, Node> cache = new HashMap<>();
+    private Node head, tail;
+
+    // Constructor to initialize the LRU cache with a given capacity
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        head = new Node(0, 0);
+        tail = new Node(0, 0);
+        head.next = tail;
+        tail.prev = head;
+    }
+    
+    // Remove a node from the doubly linked list
+    private void remove(Node node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+   
+    // Add a node right after the dummy head node
+    private void addToHead(Node node) {
+        node.next = head.next;
+        node.next.prev = node;
+        node.prev = head;
+        head.next = node;
+    }
+
+    // Gets the value of the key if it exists in the cache, otherwise return -1
+    public int get(int key) {
+        if (cache.containsKey(key)) {
+            Node node = cache.get(key);
+            remove(node);// Remove the node from its current position 
+            addToHead(node); // Move the node to the head of the list (most recently used) 
+            return node.value; // Return the value of the node
+        }
+        return -1; //key not found
+    }
+ 
+    // Puts a new key-value pair into the cache
+    public void put(int key, int value) {
+        if (cache.containsKey(key)) {
+            Node node = cache.get(key);
+            node.value = value;
+            remove(node);
+            addToHead(node);
+        }   // If the cache is full, removes the least recently used item 
+            else if (cache.size() == capacity)
+        {  // Check if cache is full
+            Node tailPrev = tail.prev;
+            remove(tailPrev);
+            cache.remove(tailPrev.key);
+            Node node = new Node(key, value);
+            cache.put(key, node); // Insert the new key-value pair
+            addToHead(node);
+          } else {
+            Node node = new Node(key, value);
+            cache.put(key, node);
+            addToHead(node);
+          }
+        }
+    
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in); //user input
+
+        System.out.print("Enter capacity of LRU Cache: ");
+        int capacity = scanner.nextInt();
+        LRUCache cache = new LRUCache(capacity); // new LRU Cache with the given capacity
+
+        while (true) {
+            System.out.print("Enter command (put/get/exit): ");
+            String command = scanner.next();
+
+            if (command.equalsIgnoreCase("put")) {
+	    // Process the 'put' command
+                System.out.print("Enter key: ");
+                int key = scanner.nextInt();
+                System.out.print("Enter value: ");
+                int value = scanner.nextInt();
+                cache.put(key, value);
+                System.out.println("Added (" + key + ", " + value + ")"); // Add the key-value pair 
+            } 
+else if (command.equalsIgnoreCase("get")) {
+	    // Process the 'get' command
+                System.out.print("Enter key: ");
+                int key = scanner.nextInt();
+                int result = cache.get(key);
+                System.out.println("Value for key " + key + ": " + result); //Retrieve the value for key
+            } 
+else if (command.equalsIgnoreCase("exit")) {
+                System.out.println("Exiting..."); //exit
+                break;
+            } 
+else {
+                System.out.println("Invalid command. Please enter 'put', 'get', or 'exit'.");
+            }
+        }
+
+
+    }
+}//end of program
