@@ -1,0 +1,68 @@
+import java.util.*;
+public class KthLargestElement {
+
+    public static void bubbleSort(int[] nums) {
+        //sort the array
+        int n = nums.length;
+        boolean swapped;
+        for (int i = 0; i < n - 1; i++) {
+            swapped = false;
+            for (int j = 0; j < n - 1 - i; j++) {
+                if (nums[j] > nums[j + 1]) {
+                    int temp = nums[j];
+                    nums[j] = nums[j + 1];
+                    nums[j + 1] = temp;
+                    swapped = true;
+                }
+            }
+            if (!swapped) 
+            break;
+        }
+    }
+
+    // Finds the kth largest element in a sorted array.
+    public static int find(int[] nums, int k) {
+        bubbleSort(nums);
+
+        // Find the kth largest element considering duplicates
+        int count = 0;
+        int currentLargest = Integer.MIN_VALUE;
+        
+        for (int i = nums.length - 1; i >= 0; i--) {
+            if (nums[i] != currentLargest) {
+                currentLargest = nums[i];
+                count++;
+            }
+            if (count == k) {
+                return currentLargest;
+            }
+        }
+        return -1; // In case k is out of range
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Take input from user
+        System.out.print("Enter the number of elements: ");
+        int n = scanner.nextInt();
+        int[] nums = new int[n];
+
+        System.out.println("Enter the elements:");
+        for (int i = 0; i < n; i++) {
+            nums[i] = scanner.nextInt();
+        }
+        
+        System.out.print("Enter the value of k: ");
+        int k = scanner.nextInt();
+        // Find the kth largest element
+        int result = find(nums, k);
+        if (result != -1) {
+            System.out.println("The " + k + "-th largest element is: " + result);
+        } 
+        else 
+        {
+            System.out.println("Invalid input: k is out of range.");
+        }
+    }
+}
