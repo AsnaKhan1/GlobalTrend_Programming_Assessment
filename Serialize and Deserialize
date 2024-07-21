@@ -1,0 +1,95 @@
+import java.util.*;
+
+class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+    TreeNode(int x) { val = x; }
+}
+
+public class Trees {
+
+    //Serializes a binary tree to a string using level-order traversal (BFS).
+    
+    public String serialize(TreeNode root) {
+        if (root == null) return "#";
+        
+        StringBuilder sb = new StringBuilder();
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        
+        while (!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            if (node == null) {
+                sb.append("#,");  // Using "#" to represent null nodes
+            } else {
+                sb.append(node.val).append(",");  // Append the node value
+                queue.offer(node.left);  // left child
+                queue.offer(node.right); // right child
+            }
+        }
+        
+        return sb.toString();
+    }
+
+    //Deserializing a string to a binary tree.
+     
+    public TreeNode deserialize(String data) {
+        if (data.equals("#")) return null;
+        
+        String[] nodes = data.split(",");
+        TreeNode root = new TreeNode(Integer.parseInt(nodes[0])); // Create the root node
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        
+        int i = 1;  // Starting with the second element (first element is root)
+        while (!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            
+            // Processing the left child
+            if (i < nodes.length && !nodes[i].equals("#")) {
+                node.left = new TreeNode(Integer.parseInt(nodes[i]));
+                queue.offer(node.left);  //left child
+            }
+            i++;
+            
+            // Processing the right child
+            if (i < nodes.length && !nodes[i].equals("#")) {
+                node.right = new TreeNode(Integer.parseInt(nodes[i]));
+                queue.offer(node.right); // right child
+            }
+            i++;
+        }
+        
+        return root;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Trees trees = new Trees();
+        
+        // Taking input from the user
+        System.out.println("Enter the tree nodes in level-order, separated by spaces (use # for null):");
+        String input = scanner.nextLine();
+        String[] nodeValues = input.split(" ");
+        
+        // Converting input to a format suitable for the deserialize method
+        StringBuilder sb = new StringBuilder();
+        for (String value : nodeValues) {
+            sb.append(value).append(",");
+        }
+        String data = sb.toString();
+
+        // Deserializing the user input to a tree
+        TreeNode root = trees.deserialize(data);
+
+        // Serializing the tree back to a string and printing it
+        String serializedTree = trees.serialize(root);
+        System.out.println("Serialized tree: " + serialize
+dTree);
+
+        // Deserializing the string back to a tree and printing the result
+        TreeNode deserializedTree = trees.deserialize(serializedTree);
+        System.out.println("Deserialized tree: " + trees.serialize(deserializedTree));
+    }
+}
