@@ -1,0 +1,39 @@
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.List;
+
+public class ConcurrentModificationDemo {
+
+    public static void main(String[] args) {
+        List<String> List1 = new ArrayList<>();
+        List1.add("A");
+        List1.add("B");
+        List1.add("C");
+
+        // Triggering ConcurrentModificationException
+        try {
+            Iterator<String> iterator = List1.iterator();
+            while (iterator.hasNext()) {
+                String element = iterator.next();
+                if (element.equals("B")) {
+                    List1.remove(element); // Modifying the list while iterating
+                }
+            }
+        } catch (ConcurrentModificationException e) {
+            System.out.println("ConcurrentModificationException caught: " + e);
+        }
+
+        // Properly handling modifications using Iterator's remove method
+        Iterator<String> iterator = List1.iterator();
+        while (iterator.hasNext()) {
+            String element = iterator.next();
+            if (element.equals("A")) {
+                iterator.remove(); // Correct way to remove elements during iteration
+            }
+        }
+
+        // Printing the modified list
+        System.out.println("Modified list: " + List1);
+    }
+}
